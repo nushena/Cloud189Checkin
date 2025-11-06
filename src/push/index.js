@@ -186,11 +186,20 @@ const pushWebHook = (title, desp) => {
     return;
   }
   // 默认使用GET方法，将title和content作为URL参数
-  const url = webHook.webhookUrl
+  let url = webHook.webhookUrl
     .replace('$title', encodeURIComponent(title))
     .replace('$content', encodeURIComponent(desp));
   
-  const headers = webHook.webhookHeaders ? JSON.parse(webHook.webhookHeaders) : {};
+  let headers = {};
+  if (webHook.webhookHeaders) {
+    try {
+      headers = JSON.parse(webHook.webhookHeaders);
+    } catch (err) {
+      logger.warn(`WebHook headers解析失败，将使用空headers: ${err.message}`);
+      headers = {};
+    }
+  }
+  
   superagent
     .get(url)
     .set(headers)
