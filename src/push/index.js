@@ -7,6 +7,7 @@ const wxpush = require("./wxPusher");
 const pushPlus = require("./pushPlus");
 const bark = require("./bark");
 const showDoc = require("./showDoc");
+const webHook = require("./webHook");
 
 const logger = log4js.getLogger("push");
 logger.addContext("user", "push");
@@ -180,9 +181,31 @@ const pushShowDoc = (title, desp) => {
     });
 };
 
+const pushWebHook = (title, desp) => {
+  if (!(webHook.webhookUrl)) {
+    return;
+  }
+  const data = {
+    title,
+    content: desp,
+  };
+  const headers = webHook.webhookHeaders ? JSON.parse(webHook.webhookHeaders) : {};
+  superagent
+    .post(webHook.webhookUrl)
+    .set(headers)
+    .send(data)
+    .then((res) => {
+      logger.info("WebHook推送成功");
+    })
+    .catch((err) => {
+      logger.error(`WebHook推送失败:${JSON.stringify(err)}`);
+    });
+};
+
 const push = (title, desp) => {
   pushServerChan(title, desp);
   pushTelegramBot(title, desp);
+  pushWebHook(title, desp);
   pushWecomBot(title, desp);
   pushWxPusher(title, desp);
   pushPlusPusher(title, desp);
