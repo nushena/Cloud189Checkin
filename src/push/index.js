@@ -185,43 +185,21 @@ const pushWebHook = (title, desp) => {
   if (!(webHook.webhookUrl)) {
     return;
   }
-  // 检查URL是否包含参数占位符
-  const hasPlaceholders = webHook.webhookUrl.includes('$title') || webHook.webhookUrl.includes('$content');
+  // 默认使用GET方法，将title和content作为URL参数
+  const url = webHook.webhookUrl
+    .replace('$title', encodeURIComponent(title))
+    .replace('$content', encodeURIComponent(desp));
   
-  if (hasPlaceholders) {
-    // 如果URL包含占位符，则替换它们
-    const url = webHook.webhookUrl
-      .replace('$title', encodeURIComponent(title))
-      .replace('$content', encodeURIComponent(desp));
-    
-    const headers = webHook.webhookHeaders ? JSON.parse(webHook.webhookHeaders) : {};
-    superagent
-      .get(url)
-      .set(headers)
-      .then((res) => {
-        logger.info("WebHook推送成功");
-      })
-      .catch((err) => {
-        logger.error(`WebHook推送失败:${JSON.stringify(err)}`);
-      });
-  } else {
-    // 否则使用POST方法发送JSON数据
-    const data = {
-      title,
-      content: desp,
-    };
-    const headers = webHook.webhookHeaders ? JSON.parse(webHook.webhookHeaders) : {};
-    superagent
-      .post(webHook.webhookUrl)
-      .set(headers)
-      .send(data)
-      .then((res) => {
-        logger.info("WebHook推送成功");
-      })
-      .catch((err) => {
-        logger.error(`WebHook推送失败:${JSON.stringify(err)}`);
-      });
-  }
+  const headers = webHook.webhookHeaders ? JSON.parse(webHook.webhookHeaders) : {};
+  superagent
+    .get(url)
+    .set(headers)
+    .then((res) => {
+      logger.info("WebHook推送成功");
+    })
+    .catch((err) => {
+      logger.error(`WebHook推送失败:${JSON.stringify(err)}`);
+    });
 };
 
 const push = (title, desp) => {
