@@ -117,7 +117,7 @@ async function main() {
   try {
     await main();
     //等待日志文件写入
-    // await delay(1000);
+  await delay(1000);
   } finally {
     const logs = catLogs();
     const events = recording.replay();

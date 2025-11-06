@@ -185,11 +185,6 @@ const pushWebHook = (title, desp) => {
   if (!(webHook.webhookUrl)) {
     return;
   }
-  
-  // 输出环境变量值，用于调试
-  logger.info(`WebHook URL: ${webHook.webhookUrl}`);
-  logger.info(`WebHook Headers: ${webHook.webhookHeaders}`);
-  
   // 默认使用GET方法，将title和content作为URL参数
   let url = webHook.webhookUrl
     .replace('$title', encodeURIComponent(title))
